@@ -2,7 +2,9 @@ public class QuantityMeasurementApp {
 
     enum LengthUnit {
         FEET(1.0),
-        INCH(1.0 / 12.0);
+        INCH(1.0 / 12.0),
+        YARD(3.0),
+        CENTIMETER(0.0328084); // 1 cm = 0.0328084 feet
 
         private final double toFeetFactor;
 
@@ -48,9 +50,14 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength q2 = new QuantityLength(12.0, LengthUnit.INCH);
+        QuantityLength q1 = new QuantityLength(1.0, LengthUnit.YARD);
+        QuantityLength q2 = new QuantityLength(3.0, LengthUnit.FEET);
 
         System.out.println("Equal: " + q1.equals(q2));
+
+        QuantityLength q3 = new QuantityLength(1.0, LengthUnit.CENTIMETER);
+        QuantityLength q4 = new QuantityLength(0.393701, LengthUnit.INCH);
+
+        System.out.println("Equal: " + q3.equals(q4));
     }
 }
