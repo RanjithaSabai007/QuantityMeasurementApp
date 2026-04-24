@@ -1,5 +1,6 @@
 public class QuantityMeasurementApp {
 
+    // Standalone-style enum (but inside same file for simplicity)
     enum LengthUnit {
         FEET(1.0),
         INCH(1.0 / 12.0),
@@ -12,12 +13,12 @@ public class QuantityMeasurementApp {
             this.toFeetFactor = toFeetFactor;
         }
 
-        public double toFeet(double value) {
+        public double convertToBaseUnit(double value) {
             return value * toFeetFactor;
         }
 
-        public double fromFeet(double feetValue) {
-            return feetValue / toFeetFactor;
+        public double convertFromBaseUnit(double baseValue) {
+            return baseValue / toFeetFactor;
         }
     }
 
@@ -36,8 +37,8 @@ public class QuantityMeasurementApp {
             this.unit = unit;
         }
 
-        public double toBase() {
-            return unit.toFeet(value);
+        private double toBase() {
+            return unit.convertToBaseUnit(value);
         }
 
         public QuantityLength convertTo(LengthUnit targetUnit) {
@@ -45,23 +46,21 @@ public class QuantityMeasurementApp {
                 throw new IllegalArgumentException("Target unit cannot be null");
             }
             double base = toBase();
-            double converted = targetUnit.fromFeet(base);
+            double converted = targetUnit.convertFromBaseUnit(base);
             return new QuantityLength(converted, targetUnit);
         }
 
-        // UC6: default (result in first operand unit)
+        // UC6 (default: result in first operand unit)
         public QuantityLength add(QuantityLength other) {
             if (other == null) {
-                throw new IllegalArgumentException("Other length cannot be null");
+                throw new IllegalArgumentException("Other cannot be null");
             }
-
             double sumBase = this.toBase() + other.toBase();
-            double result = this.unit.fromFeet(sumBase);
-
+            double result = this.unit.convertFromBaseUnit(sumBase);
             return new QuantityLength(result, this.unit);
         }
 
-        // UC7: explicit target unit
+        // UC7 (explicit target unit)
         public static QuantityLength add(QuantityLength l1, QuantityLength l2, LengthUnit targetUnit) {
             if (l1 == null || l2 == null) {
                 throw new IllegalArgumentException("Operands cannot be null");
@@ -69,10 +68,8 @@ public class QuantityMeasurementApp {
             if (targetUnit == null) {
                 throw new IllegalArgumentException("Target unit cannot be null");
             }
-
             double sumBase = l1.toBase() + l2.toBase();
-            double result = targetUnit.fromFeet(sumBase);
-
+            double result = targetUnit.convertFromBaseUnit(sumBase);
             return new QuantityLength(result, targetUnit);
         }
 
@@ -101,13 +98,13 @@ public class QuantityMeasurementApp {
         QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
         QuantityLength b = new QuantityLength(12.0, LengthUnit.INCH);
 
-        System.out.println(QuantityLength.add(a, b, LengthUnit.FEET));      // 2 FEET
-        System.out.println(QuantityLength.add(a, b, LengthUnit.INCH));      // 24 INCH
-        System.out.println(QuantityLength.add(a, b, LengthUnit.YARD));      // ~0.667 YARD
+        System.out.println(a.convertTo(LengthUnit.INCH));        // 12 INCH
+        System.out.println(a.add(b));                            // 2 FEET
+        System.out.println(QuantityLength.add(a, b, LengthUnit.YARD)); // ~0.667 YARD
 
-        QuantityLength c = new QuantityLength(2.54, LengthUnit.CENTIMETER);
-        QuantityLength d = new QuantityLength(1.0, LengthUnit.INCH);
+        QuantityLength c = new QuantityLength(36.0, LengthUnit.INCH);
+        QuantityLength d = new QuantityLength(1.0, LengthUnit.YARD);
 
-        System.out.println(QuantityLength.add(c, d, LengthUnit.CENTIMETER)); // ~5.08 CM
+        System.out.println(c.equals(d)); // true
     }
 }
