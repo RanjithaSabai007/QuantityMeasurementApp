@@ -26,8 +26,12 @@ public class QuantityMeasurementApp {
         private final LengthUnit unit;
 
         public QuantityLength(double value, LengthUnit unit) {
-            if (unit == null) throw new IllegalArgumentException("Unit cannot be null");
-            if (!Double.isFinite(value)) throw new IllegalArgumentException("Invalid value");
+            if (unit == null) {
+                throw new IllegalArgumentException("Unit cannot be null");
+            }
+            if (!Double.isFinite(value)) {
+                throw new IllegalArgumentException("Invalid numeric value");
+            }
             this.value = value;
             this.unit = unit;
         }
@@ -37,14 +41,18 @@ public class QuantityMeasurementApp {
         }
 
         public QuantityLength convertTo(LengthUnit targetUnit) {
-            if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
+            }
             double base = toBase();
             double converted = targetUnit.fromFeet(base);
             return new QuantityLength(converted, targetUnit);
         }
 
         public QuantityLength add(QuantityLength other) {
-            if (other == null) throw new IllegalArgumentException("Other length cannot be null");
+            if (other == null) {
+                throw new IllegalArgumentException("Other length cannot be null");
+            }
 
             double sumBase = this.toBase() + other.toBase();
             double result = this.unit.fromFeet(sumBase);
@@ -53,8 +61,12 @@ public class QuantityMeasurementApp {
         }
 
         public static QuantityLength add(QuantityLength l1, QuantityLength l2, LengthUnit targetUnit) {
-            if (l1 == null || l2 == null) throw new IllegalArgumentException("Operands cannot be null");
-            if (targetUnit == null) throw new IllegalArgumentException("Target unit cannot be null");
+            if (l1 == null || l2 == null) {
+                throw new IllegalArgumentException("Operands cannot be null");
+            }
+            if (targetUnit == null) {
+                throw new IllegalArgumentException("Target unit cannot be null");
+            }
 
             double sumBase = l1.toBase() + l2.toBase();
             double result = targetUnit.fromFeet(sumBase);
@@ -82,21 +94,57 @@ public class QuantityMeasurementApp {
         }
     }
 
+    public static double convert(double value, LengthUnit source, LengthUnit target) {
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Units cannot be null");
+        }
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid numeric value");
+        }
+
+        double base = source.toFeet(value);
+        return target.fromFeet(base);
+    }
+
+    public static void demonstrateLengthConversion(double value, LengthUnit from, LengthUnit to) {
+        double result = convert(value, from, to);
+        System.out.println("Converted: " + value + " " + from + " = " + result + " " + to);
+    }
+
+    public static void demonstrateLengthConversion(QuantityLength length, LengthUnit to) {
+        QuantityLength converted = length.convertTo(to);
+        System.out.println("Converted: " + length + " = " + converted);
+    }
+
+    public static void demonstrateLengthEquality(QuantityLength q1, QuantityLength q2) {
+        System.out.println("Equal: " + q1.equals(q2));
+    }
+
     public static void main(String[] args) {
+
+        demonstrateLengthConversion(1.0, LengthUnit.FEET, LengthUnit.INCH);
+        demonstrateLengthConversion(3.0, LengthUnit.YARD, LengthUnit.FEET);
+
+        QuantityLength q1 = new QuantityLength(36.0, LengthUnit.INCH);
+        demonstrateLengthConversion(q1, LengthUnit.YARD);
 
         QuantityLength a = new QuantityLength(1.0, LengthUnit.FEET);
         QuantityLength b = new QuantityLength(12.0, LengthUnit.INCH);
 
-        System.out.println(a.add(b)); // 2 FEET
+        System.out.println(a.add(b));
 
         QuantityLength c = new QuantityLength(12.0, LengthUnit.INCH);
         QuantityLength d = new QuantityLength(1.0, LengthUnit.FEET);
 
-        System.out.println(c.add(d)); // 24 INCH
+        System.out.println(c.add(d));
 
         QuantityLength e = new QuantityLength(1.0, LengthUnit.YARD);
         QuantityLength f = new QuantityLength(3.0, LengthUnit.FEET);
 
-        System.out.println(QuantityLength.add(e, f, LengthUnit.YARD)); // 2 YARD
+        System.out.println(QuantityLength.add(e, f, LengthUnit.YARD));
+
+        QuantityLength x = new QuantityLength(1.0, LengthUnit.YARD);
+        QuantityLength y = new QuantityLength(3.0, LengthUnit.FEET);
+        demonstrateLengthEquality(x, y);
     }
 }
